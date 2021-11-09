@@ -31,6 +31,8 @@ class Server {
                     res.end();
                 }}
          } );
+
+         this.sockets = new Sockets( this.io );
     }
 
     middlewares() {
@@ -38,22 +40,23 @@ class Server {
         this.app.use( cors() );
         // Desplegar el directorio público
         this.app.use( express.static( path.resolve( __dirname, '../public' ))); 
+
+        //Get de los últimos tickets
+        this.app.get( '/ultimos', (req, res) => {
+            res.json({
+                ok:true, 
+                ultimos: this.sockets.ticketList.ultimos13
+            })
+        });
     }
 
-    // Esta configuración se puede tener aquí o como propieda de clase
-    // depende mucho de lo que necesites
-    configurarSockets() {
-        new Sockets( this.io );
-    }
 
     execute() {
 
         // Inicializar Middlewares
         this.middlewares();
 
-        // Inicializar sockets
-        this.configurarSockets();
-
+       
         // Inicializar Server
         this.server.listen( this.port, () => {
             console.log('Server corriendo en puerto:', this.port );
